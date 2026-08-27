@@ -13,7 +13,11 @@ namespace CapArt
     /// </summary>
     public class CapArtProject
     {
-        const int kMaxPhotoSize = 768; // imported photos are downscaled to this
+        /// <summary>
+        /// Imported photos up to this size (longest side, px) are stored
+        /// byte-identical; only larger ones are downscaled to it.
+        /// </summary>
+        public const int kMaxPhotoSize = 2560;
 
         [Serializable]
         public class CapTypeDto
@@ -25,7 +29,8 @@ namespace CapArt
             public float cropZoom = 1f;
             public Vector2 cropCenter = new Vector2(0.5f, 0.5f);
             public int sortOrder;
-            public string photoB64; // JPEG bytes as base64, empty = no photo
+            public string photoB64; // image file bytes as base64, empty = no photo
+            public bool photoFromBundle; // photo came from the bundled samples and was never replaced by the user
         }
 
         [Serializable]
@@ -54,6 +59,8 @@ namespace CapArt
 
         readonly Dictionary<CapType, string> _capIds = new Dictionary<CapType, string>();
         readonly Dictionary<CapType, string> _photoB64 = new Dictionary<CapType, string>();
+        // Caps whose photo still is the bundled sample photo (safe to auto-update).
+        readonly HashSet<CapType> _bundlePhotoCaps = new HashSet<CapType>();
 
         public static string SavePath
         {
@@ -99,6 +106,7 @@ namespace CapArt
             caps.Remove(cap);
             _capIds.Remove(cap);
             _photoB64.Remove(cap);
+            _bundlePhotoCaps.Remove(cap);
             CapCropBaker.Release(cap);
             if (cap.texture != null)
                 UnityEngine.Object.Destroy(cap.texture);
@@ -106,55 +114,83 @@ namespace CapArt
         }
 
         /// <summary>
-        /// Imports raw image bytes (PNG/JPEG) as a cap photo: decodes,
-        /// downscales to a manageable size, re-encodes as JPEG for storage and
-        /// returns the texture (not yet assigned to any cap).
+        /// Decodes PNG/JPEG bytes into a texture guaranteed to have a full
+        /// mipmap chain (required for clean crop baking and small previews),
+        /// trilinear filtering and clamped edges. Null if not a readable image.
+        ///
+        /// Photo textures keep the sRGB flag (linear:false), like imported
+        /// texture assets. All cropping/downscaling in the app is done on the
+        /// CPU (CapArtResample) so pixel bytes are never run through GPU
+        /// color-space conversions.
+        /// </summary>
+        public static Texture2D DecodePhotoTexture(byte[] bytes)
+        {
+            var loaded = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            if (!loaded.LoadImage(bytes))
+            {
+                UnityEngine.Object.Destroy(loaded);
+                return null;
+            }
+            var result = new Texture2D(loaded.width, loaded.height, TextureFormat.RGBA32, true, false)
+            {
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Trilinear
+            };
+            result.SetPixels32(loaded.GetPixels32());
+            result.Apply(true, false);
+            UnityEngine.Object.Destroy(loaded);
+            return result;
+        }
+
+        /// <summary>
+        /// Imports raw image bytes (PNG/JPEG) as a cap photo. Images up to
+        /// kMaxPhotoSize are stored byte-identical — no recompression, no
+        /// resizing. Larger ones are downscaled once using mipmapped GPU
+        /// filtering and re-encoded at near-lossless quality.
         /// </summary>
         public static bool TryDecodePhoto(byte[] rawBytes, out Texture2D texture, out string storedB64)
         {
             texture = null;
             storedB64 = null;
-            var loaded = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            if (!loaded.LoadImage(rawBytes))
-            {
-                UnityEngine.Object.Destroy(loaded);
+            Texture2D loaded = DecodePhotoTexture(rawBytes);
+            if (loaded == null)
                 return false;
-            }
 
             int w = loaded.width;
             int h = loaded.height;
             int max = Mathf.Max(w, h);
-            if (max > kMaxPhotoSize)
+            if (max <= kMaxPhotoSize)
             {
-                float scale = (float)kMaxPhotoSize / max;
-                int nw = Mathf.Max(1, Mathf.RoundToInt(w * scale));
-                int nh = Mathf.Max(1, Mathf.RoundToInt(h * scale));
-                RenderTexture rt = RenderTexture.GetTemporary(nw, nh, 0, RenderTextureFormat.ARGB32);
-                RenderTexture prev = RenderTexture.active;
-                try
-                {
-                    Graphics.Blit(loaded, rt);
-                    RenderTexture.active = rt;
-                    var small = new Texture2D(nw, nh, TextureFormat.RGBA32, false);
-                    small.ReadPixels(new Rect(0f, 0f, nw, nh), 0, 0);
-                    small.Apply();
-                    UnityEngine.Object.Destroy(loaded);
-                    loaded = small;
-                }
-                finally
-                {
-                    RenderTexture.active = prev;
-                    RenderTexture.ReleaseTemporary(rt);
-                }
+                // Keep the user's file exactly as it is.
+                storedB64 = Convert.ToBase64String(rawBytes);
+                texture = loaded;
+                return true;
             }
 
-            byte[] jpg = loaded.EncodeToJPG(88);
-            storedB64 = Convert.ToBase64String(jpg);
-            // Rebuild the texture from the stored bytes so what you see is what is saved.
+            float scale = (float)kMaxPhotoSize / max;
+            int nw = Mathf.Max(1, Mathf.RoundToInt(w * scale));
+            int nh = Mathf.Max(1, Mathf.RoundToInt(h * scale));
+            // CPU downscale from the closest mip — no GPU, no color conversions.
+            int mip = 0;
+            while (mip < loaded.mipmapCount - 1 && (max >> (mip + 1)) >= kMaxPhotoSize)
+                mip++;
+            int mipW = Mathf.Max(1, w >> mip);
+            int mipH = Mathf.Max(1, h >> mip);
+            Color32[] srcPixels = loaded.GetPixels32(mip);
+            var dstPixels = new Color32[nw * nh];
+            CapArtResample.Resample(srcPixels, mipW, mipH, new Rect(0f, 0f, mipW, mipH), dstPixels, nw, nh);
+            byte[] jpg;
+            {
+                var small = new Texture2D(nw, nh, TextureFormat.RGBA32, false);
+                small.SetPixels32(dstPixels);
+                small.Apply(false, false);
+                jpg = small.EncodeToJPG(95);
+                UnityEngine.Object.Destroy(small);
+            }
             UnityEngine.Object.Destroy(loaded);
-            texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            texture.LoadImage(jpg);
-            return true;
+            storedB64 = Convert.ToBase64String(jpg);
+            texture = DecodePhotoTexture(jpg);
+            return texture != null;
         }
 
         public void SetCapPhoto(CapType cap, Texture2D texture, string storedB64)
@@ -162,6 +198,7 @@ namespace CapArt
             if (cap.texture != null && cap.texture != texture)
                 UnityEngine.Object.Destroy(cap.texture);
             cap.texture = texture;
+            _bundlePhotoCaps.Remove(cap); // the photo is user-chosen from now on
             if (string.IsNullOrEmpty(storedB64))
                 _photoB64.Remove(cap);
             else
@@ -242,7 +279,8 @@ namespace CapArt
                     cropZoom = cap.cropZoom,
                     cropCenter = cap.cropCenter,
                     sortOrder = cap.sortOrder,
-                    photoB64 = GetCapPhotoB64(cap) ?? ""
+                    photoB64 = GetCapPhotoB64(cap) ?? "",
+                    photoFromBundle = _bundlePhotoCaps.Contains(cap)
                 });
             }
             for (int i = 0; i < mosaics.Count; i++)
@@ -287,35 +325,8 @@ namespace CapArt
             dto.caps.Sort((a, b) => a.sortOrder.CompareTo(b.sortOrder));
             foreach (CapTypeDto capDto in dto.caps)
             {
-                var cap = ScriptableObject.CreateInstance<CapType>();
-                cap.name = capDto.name;
-                cap.color = capDto.color;
-                cap.amount = capDto.amount;
-                cap.cropZoom = capDto.cropZoom;
-                cap.cropCenter = capDto.cropCenter;
-                cap.sortOrder = capDto.sortOrder;
-                if (!string.IsNullOrEmpty(capDto.photoB64))
-                {
-                    try
-                    {
-                        byte[] jpg = Convert.FromBase64String(capDto.photoB64);
-                        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                        if (tex.LoadImage(jpg))
-                        {
-                            cap.texture = tex;
-                            _photoB64[cap] = capDto.photoB64;
-                        }
-                        else
-                        {
-                            UnityEngine.Object.Destroy(tex);
-                        }
-                    }
-                    catch (Exception) { }
-                }
-                caps.Add(cap);
-                string id = string.IsNullOrEmpty(capDto.id) ? Guid.NewGuid().ToString("N") : capDto.id;
-                _capIds[cap] = id;
-                byId[id] = cap;
+                CapType cap = InstantiateCap(capDto);
+                byId[_capIds[cap]] = cap;
             }
 
             foreach (MosaicDto mosaicDto in dto.mosaics)
@@ -343,6 +354,40 @@ namespace CapArt
             return true;
         }
 
+        /// <summary>Creates a cap instance from a DTO and registers it (list, id, photo).</summary>
+        CapType InstantiateCap(CapTypeDto capDto)
+        {
+            var cap = ScriptableObject.CreateInstance<CapType>();
+            cap.name = capDto.name;
+            cap.color = capDto.color;
+            cap.amount = capDto.amount;
+            cap.cropZoom = capDto.cropZoom;
+            cap.cropCenter = capDto.cropCenter;
+            cap.sortOrder = capDto.sortOrder;
+            if (!string.IsNullOrEmpty(capDto.photoB64))
+            {
+                try
+                {
+                    byte[] bytes = Convert.FromBase64String(capDto.photoB64);
+                    Texture2D tex = DecodePhotoTexture(bytes);
+                    if (tex != null)
+                    {
+                        cap.texture = tex;
+                        _photoB64[cap] = capDto.photoB64;
+                        if (capDto.photoFromBundle)
+                            _bundlePhotoCaps.Add(cap);
+                    }
+                }
+                catch (Exception) { }
+            }
+            caps.Add(cap);
+            string id = string.IsNullOrEmpty(capDto.id) ? Guid.NewGuid().ToString("N") : capDto.id;
+            if (_capIds.ContainsValue(id))
+                id = Guid.NewGuid().ToString("N");
+            _capIds[cap] = id;
+            return cap;
+        }
+
         public void Clear()
         {
             foreach (CapMosaic m in mosaics)
@@ -359,6 +404,7 @@ namespace CapArt
             caps.Clear();
             _capIds.Clear();
             _photoB64.Clear();
+            _bundlePhotoCaps.Clear();
         }
 
         // ------------------------------------------------------------- disk
@@ -375,20 +421,161 @@ namespace CapArt
             }
         }
 
-        /// <summary>Loads the auto-saved project, or creates a fresh default one.</summary>
-        public void LoadFromDiskOrCreateDefault()
+        /// <summary>Name of the bundled sample project inside a Resources folder.</summary>
+        public const string kDefaultResourceName = "capart-default-project";
+
+        /// <summary>
+        /// Replaces the current content with the sample project bundled into the
+        /// build (baked from the repo's cap assets). Returns false if none is
+        /// bundled; the current content is only replaced on success.
+        /// </summary>
+        public bool LoadBundledDefault()
+        {
+            var bundled = Resources.Load<TextAsset>(kDefaultResourceName);
+            if (bundled == null)
+                return false;
+            string json = bundled.text;
+            Resources.UnloadAsset(bundled);
+            var probe = new CapArtProject();
+            bool ok = probe.FromJson(json);
+            probe.Clear();
+            if (!ok)
+                return false;
+            FromJson(json);
+            if (mosaics.Count == 0)
+                NewMosaic("My Mosaic");
+            return true;
+        }
+
+        /// <summary>
+        /// Appends the bundled sample cap types to the current project without
+        /// touching its mosaics. Used for saves that have no caps at all (e.g.
+        /// saves made before the samples existed). Returns true if caps were added.
+        /// </summary>
+        public bool AddBundledSampleCaps()
+        {
+            var bundled = Resources.Load<TextAsset>(kDefaultResourceName);
+            if (bundled == null)
+                return false;
+            string json = bundled.text;
+            Resources.UnloadAsset(bundled);
+            ProjectDto dto;
+            try
+            {
+                dto = JsonUtility.FromJson<ProjectDto>(json);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            if (dto == null || dto.caps == null || dto.caps.Count == 0)
+                return false;
+            dto.caps.Sort((a, b) => a.sortOrder.CompareTo(b.sortOrder));
+            int nextOrder = 0;
+            foreach (CapType existing in caps)
+                nextOrder = Mathf.Max(nextOrder, existing.sortOrder + 1);
+            foreach (CapTypeDto capDto in dto.caps)
+            {
+                CapType cap = InstantiateCap(capDto);
+                cap.sortOrder = nextOrder++;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Updates the photos of caps that came from the bundled samples — and
+        /// were never given a different photo by the user — when the bundle
+        /// carries different bytes. This lets improved sample photos reach
+        /// existing saves. Returns how many caps were updated.
+        /// </summary>
+        public int SyncBundledSamplePhotos()
+        {
+            if (_bundlePhotoCaps.Count == 0)
+                return 0;
+            var bundled = Resources.Load<TextAsset>(kDefaultResourceName);
+            if (bundled == null)
+                return 0;
+            string json = bundled.text;
+            Resources.UnloadAsset(bundled);
+            ProjectDto dto;
+            try
+            {
+                dto = JsonUtility.FromJson<ProjectDto>(json);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+            if (dto == null || dto.caps == null)
+                return 0;
+
+            var photoById = new Dictionary<string, string>();
+            foreach (CapTypeDto capDto in dto.caps)
+            {
+                if (!string.IsNullOrEmpty(capDto.id) && !string.IsNullOrEmpty(capDto.photoB64))
+                    photoById[capDto.id] = capDto.photoB64;
+            }
+
+            int updated = 0;
+            foreach (CapType cap in caps)
+            {
+                if (!_bundlePhotoCaps.Contains(cap))
+                    continue;
+                if (!_capIds.TryGetValue(cap, out string id) || !photoById.TryGetValue(id, out string freshB64))
+                    continue;
+                if (GetCapPhotoB64(cap) == freshB64)
+                    continue;
+                try
+                {
+                    Texture2D tex = DecodePhotoTexture(Convert.FromBase64String(freshB64));
+                    if (tex == null)
+                        continue;
+                    if (cap.texture != null)
+                        UnityEngine.Object.Destroy(cap.texture);
+                    cap.texture = tex;
+                    _photoB64[cap] = freshB64;
+                    updated++;
+                }
+                catch (Exception) { }
+            }
+            return updated;
+        }
+
+        /// <summary>
+        /// Loads the auto-saved project; falls back to the bundled sample
+        /// project on first run, then to a fresh empty one. A save without a
+        /// single cap type gets the bundled sample caps added (nothing can be
+        /// painted without caps, so nothing is lost). Returns true when the
+        /// resulting state differs from what is on disk and should be saved.
+        /// </summary>
+        public bool LoadFromDiskOrCreateDefault()
         {
             try
             {
                 if (File.Exists(SavePath) && FromJson(File.ReadAllText(SavePath)))
-                    return;
+                {
+                    bool changed = false;
+                    if (mosaics.Count == 0)
+                    {
+                        NewMosaic("My Mosaic");
+                        changed = true;
+                    }
+                    if (caps.Count == 0 && AddBundledSampleCaps())
+                        changed = true;
+                    if (SyncBundledSamplePhotos() > 0)
+                        changed = true;
+                    return changed;
+                }
             }
             catch (Exception e)
             {
                 Debug.LogWarning("Cap Art: could not load project: " + e.Message);
             }
+            if (LoadBundledDefault())
+                return true;
             Clear();
             NewMosaic("My Mosaic");
+            return true;
         }
     }
 }

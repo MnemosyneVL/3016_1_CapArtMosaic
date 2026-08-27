@@ -38,6 +38,9 @@ so you can plan yours.
     100 mm calibration bar — print at 100% scale and punch through the marks.
 - **Multiple mosaics** in one project, and a single-file **project export**
   (photos embedded) for backup or sharing.
+- **Sample caps included** — the app starts with 16 real bottle cap photos
+  from the author's collection, so you can try everything before importing
+  your own. Get them back anytime via *Export / Import → Load sample project*.
 
 Designs auto-save locally (in the browser's storage for the web version — use
 *Export project file* for a safe backup).
@@ -73,6 +76,12 @@ share the same core code. See
 
 1. **File → Build Profiles**, pick **Windows** (or **macOS**) and build.
 2. Zip the build folder and attach it to a GitHub Release.
+
+### Refreshing the bundled sample caps
+
+The sample caps live in `Assets/CapArt/Resources/capart-default-project.json`.
+After changing the CapType assets in the project, run
+**Tools → Cap Art → Bake Default Caps for App** to regenerate it, then rebuild.
 
 ## License
 

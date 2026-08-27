@@ -91,6 +91,7 @@ namespace CapArt
 
         // Saving / misc UI.
         bool _dirty;
+        bool _statusSaving; // _dirty latched at Layout, for a stable status-bar control count
         float _lastChangeTime;
         string _toast;
         float _toastUntil;
@@ -116,7 +117,8 @@ namespace CapArt
         {
             gameObject.name = "CapArtApp";
             _project = new CapArtProject();
-            _project.LoadFromDiskOrCreateDefault();
+            if (_project.LoadFromDiskOrCreateDefault())
+                MarkDirty(); // persist injected samples / first-run defaults
             _mosaicIndex = 0;
         }
 
@@ -271,6 +273,11 @@ namespace CapArt
             }
             probe.Clear();
             _project.FromJson(json);
+            AfterProjectReplaced("Project imported.");
+        }
+
+        void AfterProjectReplaced(string toastMessage)
+        {
             if (_project.mosaics.Count == 0)
                 _project.NewMosaic("My Mosaic");
             _mosaicIndex = 0;
@@ -281,7 +288,7 @@ namespace CapArt
             _fieldEdits.Clear();
             _fitPending = true;
             MarkDirty();
-            SetToast("Project imported.");
+            SetToast(toastMessage);
         }
 
         // ------------------------------------------------------------ counts
@@ -392,6 +399,8 @@ namespace CapArt
         {
             InitStyles();
             UpdateCountsIfNeeded();
+            if (Event.current.type == EventType.Layout)
+                _statusSaving = _dirty;
             HandleGlobalKeys();
 
             float w = Screen.width;
@@ -882,9 +891,16 @@ namespace CapArt
             bool hasHover = interactive && !_panning && !_painting
                 && canvas.Contains(Event.current.mousePosition)
                 && CellAtPoint(Event.current.mousePosition, canvas, out hoverCol, out hoverRow);
-            _hasHoverInfo = hasHover;
-            _hoverCol = hoverCol;
-            _hoverRow = hoverRow;
+            // The status bar adds a label while a tile is hovered, and IMGUI
+            // requires identical control counts in the Layout and Repaint
+            // passes of a frame — so the fields it reads are latched during
+            // Layout only. Drawing below uses the fresh local values.
+            if (Event.current.type == EventType.Layout)
+            {
+                _hasHoverInfo = hasHover;
+                _hoverCol = hoverCol;
+                _hoverRow = hoverRow;
+            }
 
             float d = kBaseCell * _zoom;
             GUI.BeginGroup(canvas);
@@ -1061,7 +1077,7 @@ namespace CapArt
             GUILayout.Label(brush, brushStyle);
             GUILayout.Space(10f);
             GUILayout.Label("LMB paint · RMB erase · Wheel zoom · MMB/Alt pan · Ctrl+Z undo", _sMini);
-            if (_dirty)
+            if (_statusSaving)
                 GUILayout.Label("  saving…", _sMini);
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
@@ -1169,6 +1185,8 @@ namespace CapArt
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(_editCap.texture == null ? "Import Photo..." : "Replace Photo...", GUILayout.Width(130f)))
                 PickPhotoFile();
+            if (_editCap.texture != null)
+                GUILayout.Label(_editCap.texture.width + " × " + _editCap.texture.height + " px", _sMini);
             if (_editCap.texture != null && GUILayout.Button("Remove Photo", GUILayout.Width(110f)))
             {
                 if (_editCap.texture != _editSnapshotTexture)
@@ -1355,6 +1373,17 @@ namespace CapArt
                 {
                     _overlay = Overlay.None;
                     PickProjectFile();
+                }, Overlay.Export);
+            }
+            if (GUILayout.Button("Load sample project (bundled caps)…", GUILayout.Height(28f)))
+            {
+                Confirm("Load the bundled sample caps?\nThis replaces your current caps and mosaics.", () =>
+                {
+                    _overlay = Overlay.None;
+                    if (_project.LoadBundledDefault())
+                        AfterProjectReplaced("Sample project loaded.");
+                    else
+                        SetToast("No sample project is bundled in this build.", 5f);
                 }, Overlay.Export);
             }
 

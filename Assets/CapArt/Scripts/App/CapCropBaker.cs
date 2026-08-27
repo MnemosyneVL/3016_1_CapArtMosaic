@@ -4,9 +4,12 @@ using UnityEngine;
 namespace CapArt
 {
     /// <summary>
-    /// Runtime version of the crop baker: renders the cropped square region of
-    /// a cap photo into a cached texture. Rebakes when the source texture
-    /// reference or the crop parameters change.
+    /// Bakes the cropped square region of a cap photo into a cached 512px
+    /// texture for fast circle drawing. The bake is a pure CPU resample
+    /// (see CapArtResample): raw sRGB bytes go in and come out untouched, so
+    /// the baked texture displays exactly like the photo itself — no GPU
+    /// blits, render textures or color-space conversions are involved.
+    /// Rebakes automatically when the source texture or crop changes.
     /// </summary>
     public static class CapCropBaker
     {
@@ -21,6 +24,14 @@ namespace CapArt
 
         static readonly Dictionary<CapType, Entry> sEntries = new Dictionary<CapType, Entry>();
 
+        // Single-slot cache of source pixels at a given mip level — hot while
+        // dragging in the crop editor (same source and mip every frame).
+        static Texture2D sPixelCacheTexture;
+        static int sPixelCacheMip = -1;
+        static Color32[] sPixelCache;
+
+        static readonly Color32[] sScratch = new Color32[kSize * kSize];
+
         public static Texture2D GetForCap(CapType cap)
         {
             if (cap == null || cap.texture == null)
@@ -31,8 +42,17 @@ namespace CapArt
         static Texture2D Get(CapType owner, Texture2D source, Rect uv)
         {
             sEntries.TryGetValue(owner, out Entry entry);
-            if (entry != null && entry.baked != null && entry.source == source && entry.uv == uv)
+            bool hasBake = entry != null && entry.baked != null && entry.source == source;
+            if (hasBake && entry.uv == uv)
                 return entry.baked;
+
+            // IMGUI delivers several events per frame while dragging the crop;
+            // rebake only on the Repaint pass once a bake exists.
+            if (hasBake && Event.current != null && Event.current.type != EventType.Repaint)
+                return entry.baked;
+
+            if (!source.isReadable)
+                return hasBake ? entry.baked : null;
 
             if (entry == null)
             {
@@ -41,37 +61,56 @@ namespace CapArt
             }
             if (entry.baked == null)
             {
-                entry.baked = new Texture2D(kSize, kSize, TextureFormat.RGBA32, true)
+                entry.baked = new Texture2D(kSize, kSize, TextureFormat.RGBA32, true, false)
                 {
                     hideFlags = HideFlags.HideAndDontSave,
-                    wrapMode = TextureWrapMode.Clamp
+                    wrapMode = TextureWrapMode.Clamp,
+                    filterMode = FilterMode.Trilinear
                 };
             }
 
-            RenderTexture rt = RenderTexture.GetTemporary(kSize, kSize, 0, RenderTextureFormat.ARGB32);
-            RenderTexture previous = RenderTexture.active;
-            try
-            {
-                Graphics.Blit(source, rt, new Vector2(uv.width, uv.height), new Vector2(uv.x, uv.y));
-                RenderTexture.active = rt;
-                entry.baked.ReadPixels(new Rect(0f, 0f, kSize, kSize), 0, 0);
-                entry.baked.Apply(true, false);
-            }
-            finally
-            {
-                RenderTexture.active = previous;
-                RenderTexture.ReleaseTemporary(rt);
-            }
-
+            BakeCpu(source, uv, entry.baked);
             entry.source = source;
             entry.uv = uv;
             return entry.baked;
         }
 
+        static void BakeCpu(Texture2D source, Rect uv, Texture2D dest)
+        {
+            // Use the smallest source mip that still covers the output size, so
+            // each bilinear tap spans at most ~2 source pixels.
+            float cropPx = uv.width * source.width;
+            int mip = 0;
+            while (mip < source.mipmapCount - 1 && cropPx / (1 << (mip + 1)) >= kSize)
+                mip++;
+            int mipW = Mathf.Max(1, source.width >> mip);
+            int mipH = Mathf.Max(1, source.height >> mip);
+
+            if (sPixelCacheTexture != source || sPixelCacheMip != mip || sPixelCache == null)
+            {
+                sPixelCache = source.GetPixels32(mip);
+                sPixelCacheTexture = source;
+                sPixelCacheMip = mip;
+            }
+
+            var region = new Rect(uv.x * mipW, uv.y * mipH, uv.width * mipW, uv.height * mipH);
+            CapArtResample.Resample(sPixelCache, mipW, mipH, region, sScratch, kSize, kSize);
+            dest.SetPixels32(sScratch);
+            dest.Apply(true, false);
+        }
+
         /// <summary>Frees the cached bake for a cap (e.g. when it is deleted).</summary>
         public static void Release(CapType cap)
         {
-            if (cap == null || !sEntries.TryGetValue(cap, out Entry entry))
+            if (cap == null)
+                return;
+            if (cap.texture != null && sPixelCacheTexture == cap.texture)
+            {
+                sPixelCacheTexture = null;
+                sPixelCacheMip = -1;
+                sPixelCache = null;
+            }
+            if (!sEntries.TryGetValue(cap, out Entry entry))
                 return;
             if (entry.baked != null)
                 Object.Destroy(entry.baked);
