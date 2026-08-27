@@ -1,0 +1,268 @@
+CAP ART MARKING GUIDE — My Mosaic 1
+========================================
+
+Artwork size: 621.0 × 306.13 mm  (62.1 × 30.61 cm), gaps included
+Cap Ø 29.0 mm  |  gap 3.0 mm  |  grid 19×11  |  offset rows
+
+HOW TO USE
+  All numbers are millimeters, measured from the BOTTOM-LEFT corner
+  of the artwork:
+    X = distance from the left edge, going right
+    Y = distance from the bottom edge, going up
+  Each line below is one cap. Mark a point at (X, Y) — that point is
+  the CENTER of the cap, where the pin goes.
+  Rows are numbered from the bottom: Row 1 is the bottom row.
+
+RULER SHORTCUTS
+  caps within a row:  every 32.0 mm
+  rows:               every 27.71 mm
+  neighbouring rows are shifted 16.0 mm sideways from each other
+  (the X values below show which way)
+
+GUIDE LINES (draw the horizontal lines first, then put dots on them)
+  Lines are 27.71 mm apart. Dots on a line are every 32.0 mm.
+  For exact dot positions use the row tables further below.
+  Line  1:  Y =    14.5 mm    from X   14.5 to X   590.5  (length 576.0 mm, 19 caps)    (bottom row)
+  Line  2:  Y =   42.21 mm    from X   30.5 to X   606.5  (length 576.0 mm, 19 caps)
+  Line  3:  Y =   69.93 mm    from X   14.5 to X   590.5  (length 576.0 mm, 19 caps)
+  Line  4:  Y =   97.64 mm    from X   30.5 to X   606.5  (length 576.0 mm, 19 caps)
+  Line  5:  Y =  125.35 mm    from X   14.5 to X   590.5  (length 576.0 mm, 19 caps)
+  Line  6:  Y =  153.06 mm    from X   30.5 to X   606.5  (length 576.0 mm, 19 caps)
+  Line  7:  Y =  180.78 mm    from X   14.5 to X   590.5  (length 576.0 mm, 19 caps)
+  Line  8:  Y =  208.49 mm    from X   30.5 to X   606.5  (length 576.0 mm, 19 caps)
+  Line  9:  Y =   236.2 mm    from X   14.5 to X   590.5  (length 576.0 mm, 19 caps)
+  Line 10:  Y =  263.92 mm    from X   30.5 to X   606.5  (length 576.0 mm, 19 caps)
+  Line 11:  Y =  291.63 mm    from X   14.5 to X   590.5  (length 576.0 mm, 19 caps)
+
+Row 1  (bottom row):
+  col   1:   X    14.5   Y    14.5   7
+  col   2:   X    46.5   Y    14.5   7 2
+  col   3:   X    78.5   Y    14.5   7 1
+  col   4:   X   110.5   Y    14.5   7 1
+  col   5:   X   142.5   Y    14.5   7 1
+  col   6:   X   174.5   Y    14.5   7 1
+  col   7:   X   206.5   Y    14.5   7
+  col   8:   X   238.5   Y    14.5   7 1
+  col   9:   X   270.5   Y    14.5   7 1
+  col  10:   X   302.5   Y    14.5   7 1
+  col  11:   X   334.5   Y    14.5   7 1
+  col  12:   X   366.5   Y    14.5   7 1
+  col  13:   X   398.5   Y    14.5   7 1
+  col  14:   X   430.5   Y    14.5   7 1
+  col  15:   X   462.5   Y    14.5   7 1
+  col  16:   X   494.5   Y    14.5   7 1
+  col  17:   X   526.5   Y    14.5   7 1
+  col  18:   X   558.5   Y    14.5   7 1
+  col  19:   X   590.5   Y    14.5   7 1
+
+Row 2:
+  col   1:   X    30.5   Y   42.21   7
+  col   2:   X    62.5   Y   42.21   7
+  col   3:   X    94.5   Y   42.21   7 2
+  col   4:   X   126.5   Y   42.21   7
+  col   5:   X   158.5   Y   42.21   7 1
+  col   6:   X   190.5   Y   42.21   7 1
+  col   7:   X   222.5   Y   42.21   7 1
+  col   8:   X   254.5   Y   42.21   7
+  col   9:   X   286.5   Y   42.21   7 1
+  col  10:   X   318.5   Y   42.21   7 1
+  col  11:   X   350.5   Y   42.21   7 2
+  col  12:   X   382.5   Y   42.21   7
+  col  13:   X   414.5   Y   42.21   7
+  col  14:   X   446.5   Y   42.21   7 1
+  col  15:   X   478.5   Y   42.21   7 1
+  col  16:   X   510.5   Y   42.21   7
+  col  17:   X   542.5   Y   42.21   7 1
+  col  18:   X   574.5   Y   42.21   7 1
+  col  19:   X   606.5   Y   42.21   8
+
+Row 3:
+  col   1:   X    14.5   Y   69.93   5
+  col   2:   X    46.5   Y   69.93   1
+  col   3:   X    78.5   Y   69.93   1
+  col   4:   X   110.5   Y   69.93   7
+  col   5:   X   142.5   Y   69.93   7
+  col   6:   X   174.5   Y   69.93   7 2
+  col   7:   X   206.5   Y   69.93   7 1
+  col   8:   X   238.5   Y   69.93   7 1
+  col   9:   X   270.5   Y   69.93   7
+  col  10:   X   302.5   Y   69.93   7 1
+  col  11:   X   334.5   Y   69.93   7
+  col  12:   X   366.5   Y   69.93   8
+  col  13:   X   398.5   Y   69.93   1
+  col  14:   X   430.5   Y   69.93   7
+  col  15:   X   462.5   Y   69.93   7
+  col  16:   X   494.5   Y   69.93   7 1
+  col  17:   X   526.5   Y   69.93   7 1
+  col  18:   X   558.5   Y   69.93   7
+  col  19:   X   590.5   Y   69.93   7
+
+Row 4:
+  col   1:   X    30.5   Y   97.64   5
+  col   2:   X    62.5   Y   97.64   1
+  col   3:   X    94.5   Y   97.64   1
+  col   4:   X   126.5   Y   97.64   7
+  col   5:   X   158.5   Y   97.64   7
+  col   6:   X   190.5   Y   97.64   7
+  col   7:   X   222.5   Y   97.64   7 1
+  col   8:   X   254.5   Y   97.64   7 1
+  col   9:   X   286.5   Y   97.64   7
+  col  10:   X   318.5   Y   97.64   7 1
+  col  11:   X   350.5   Y   97.64   7
+  col  12:   X   382.5   Y   97.64   1
+  col  13:   X   414.5   Y   97.64   1
+  col  14:   X   446.5   Y   97.64   1
+  col  15:   X   478.5   Y   97.64   7
+  col  16:   X   510.5   Y   97.64   8
+  col  17:   X   542.5   Y   97.64   7
+  col  18:   X   574.5   Y   97.64   1
+  col  19:   X   606.5   Y   97.64   5
+
+Row 5:
+  col   1:   X    14.5   Y  125.35   5
+  col   2:   X    46.5   Y  125.35   5
+  col   3:   X    78.5   Y  125.35   5
+  col   4:   X   110.5   Y  125.35   1
+  col   5:   X   142.5   Y  125.35   1
+  col   6:   X   174.5   Y  125.35   8
+  col   7:   X   206.5   Y  125.35   7
+  col   8:   X   238.5   Y  125.35   7 2
+  col   9:   X   270.5   Y  125.35   7 1
+  col  10:   X   302.5   Y  125.35   7 1
+  col  11:   X   334.5   Y  125.35   7 1
+  col  12:   X   366.5   Y  125.35   1
+  col  13:   X   398.5   Y  125.35   1
+  col  14:   X   430.5   Y  125.35   8
+  col  15:   X   462.5   Y  125.35   1
+  col  16:   X   494.5   Y  125.35   1
+  col  17:   X   526.5   Y  125.35   1
+  col  18:   X   558.5   Y  125.35   8
+  col  19:   X   590.5   Y  125.35   5
+
+Row 6:
+  col   1:   X    30.5   Y  153.06   3 6
+  col   2:   X    62.5   Y  153.06   5
+  col   3:   X    94.5   Y  153.06   5
+  col   4:   X   126.5   Y  153.06   5
+  col   5:   X   158.5   Y  153.06   1
+  col   6:   X   190.5   Y  153.06   8
+  col   7:   X   222.5   Y  153.06   7
+  col   8:   X   254.5   Y  153.06   7
+  col   9:   X   286.5   Y  153.06   7 1
+  col  10:   X   318.5   Y  153.06   7
+  col  11:   X   350.5   Y  153.06   7 1
+  col  12:   X   382.5   Y  153.06   7
+  col  13:   X   414.5   Y  153.06   7 2
+  col  14:   X   446.5   Y  153.06   8
+  col  15:   X   478.5   Y  153.06   1
+  col  16:   X   510.5   Y  153.06   1
+  col  17:   X   542.5   Y  153.06   5
+  col  18:   X   574.5   Y  153.06   5
+  col  19:   X   606.5   Y  153.06   5
+
+Row 7:
+  col   1:   X    14.5   Y  180.78   2
+  col   2:   X    46.5   Y  180.78   2
+  col   3:   X    78.5   Y  180.78   3 6
+  col   4:   X   110.5   Y  180.78   5
+  col   5:   X   142.5   Y  180.78   5
+  col   6:   X   174.5   Y  180.78   1
+  col   7:   X   206.5   Y  180.78   1
+  col   8:   X   238.5   Y  180.78   8
+  col   9:   X   270.5   Y  180.78   7
+  col  10:   X   302.5   Y  180.78   7 2
+  col  11:   X   334.5   Y  180.78   7 2
+  col  12:   X   366.5   Y  180.78   7
+  col  13:   X   398.5   Y  180.78   7 2
+  col  14:   X   430.5   Y  180.78   8
+  col  15:   X   462.5   Y  180.78   1
+  col  16:   X   494.5   Y  180.78   8
+  col  17:   X   526.5   Y  180.78   5
+  col  18:   X   558.5   Y  180.78   5
+  col  19:   X   590.5   Y  180.78   3 6
+
+Row 8:
+  col   1:   X    30.5   Y  208.49   3 6
+  col   2:   X    62.5   Y  208.49   2
+  col   3:   X    94.5   Y  208.49   3 6
+  col   4:   X   126.5   Y  208.49   3 6
+  col   5:   X   158.5   Y  208.49   5
+  col   6:   X   190.5   Y  208.49   5
+  col   7:   X   222.5   Y  208.49   1
+  col   8:   X   254.5   Y  208.49   1
+  col   9:   X   286.5   Y  208.49   8
+  col  10:   X   318.5   Y  208.49   8
+  col  11:   X   350.5   Y  208.49   7
+  col  12:   X   382.5   Y  208.49   8
+  col  13:   X   414.5   Y  208.49   1
+  col  14:   X   446.5   Y  208.49   1
+  col  15:   X   478.5   Y  208.49   5
+  col  16:   X   510.5   Y  208.49   5
+  col  17:   X   542.5   Y  208.49   5
+  col  18:   X   574.5   Y  208.49   3 6
+  col  19:   X   606.5   Y  208.49   2
+
+Row 9:
+  col   1:   X    14.5   Y   236.2   2
+  col   2:   X    46.5   Y   236.2   3 6
+  col   3:   X    78.5   Y   236.2   2
+  col   4:   X   110.5   Y   236.2   2
+  col   5:   X   142.5   Y   236.2   2
+  col   6:   X   174.5   Y   236.2   5
+  col   7:   X   206.5   Y   236.2   5
+  col   8:   X   238.5   Y   236.2   8
+  col   9:   X   270.5   Y   236.2   1
+  col  10:   X   302.5   Y   236.2   1
+  col  11:   X   334.5   Y   236.2   1
+  col  12:   X   366.5   Y   236.2   1
+  col  13:   X   398.5   Y   236.2   1
+  col  14:   X   430.5   Y   236.2   5
+  col  15:   X   462.5   Y   236.2   5
+  col  16:   X   494.5   Y   236.2   5
+  col  17:   X   526.5   Y   236.2   2
+  col  18:   X   558.5   Y   236.2   2
+  col  19:   X   590.5   Y   236.2   2
+
+Row 10:
+  col   1:   X    30.5   Y  263.92   2
+  col   2:   X    62.5   Y  263.92   2
+  col   3:   X    94.5   Y  263.92   2
+  col   4:   X   126.5   Y  263.92   3 6
+  col   5:   X   158.5   Y  263.92   2
+  col   6:   X   190.5   Y  263.92   2
+  col   7:   X   222.5   Y  263.92   5
+  col   8:   X   254.5   Y  263.92   5
+  col   9:   X   286.5   Y  263.92   5
+  col  10:   X   318.5   Y  263.92   8
+  col  11:   X   350.5   Y  263.92   5
+  col  12:   X   382.5   Y  263.92   8
+  col  13:   X   414.5   Y  263.92   5
+  col  14:   X   446.5   Y  263.92   5
+  col  15:   X   478.5   Y  263.92   2
+  col  16:   X   510.5   Y  263.92   2
+  col  17:   X   542.5   Y  263.92   2
+  col  18:   X   574.5   Y  263.92   2
+  col  19:   X   606.5   Y  263.92   3 6
+
+Row 11:
+  col   1:   X    14.5   Y  291.63   3 6
+  col   2:   X    46.5   Y  291.63   2
+  col   3:   X    78.5   Y  291.63   3 6
+  col   4:   X   110.5   Y  291.63   2
+  col   5:   X   142.5   Y  291.63   2
+  col   6:   X   174.5   Y  291.63   2
+  col   7:   X   206.5   Y  291.63   3 6
+  col   8:   X   238.5   Y  291.63   2
+  col   9:   X   270.5   Y  291.63   3 6
+  col  10:   X   302.5   Y  291.63   2
+  col  11:   X   334.5   Y  291.63   3 6
+  col  12:   X   366.5   Y  291.63   3 6
+  col  13:   X   398.5   Y  291.63   2
+  col  14:   X   430.5   Y  291.63   2
+  col  15:   X   462.5   Y  291.63   2
+  col  16:   X   494.5   Y  291.63   3 6
+  col  17:   X   526.5   Y  291.63   2
+  col  18:   X   558.5   Y  291.63   3 6
+  col  19:   X   590.5   Y  291.63   2
+
+Total pins: 209
