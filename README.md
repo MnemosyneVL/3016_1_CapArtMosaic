@@ -8,7 +8,7 @@ template.
 Made by an artist planning a real mosaic from a bottle cap collection; shared
 so you can plan yours.
 
-**▶ Try it in your browser:** `https://mnemosynevl.github.io/3016_1_CapArtMosaic/`
+**▶ Try it in your browser:** [mnemosynevl.github.io/3016_1_CapArtMosaic/](https://mnemosynevl.github.io/3016_1_CapArtMosaic/)
 *(link goes live once GitHub Pages is set up — see below)*
 
 **⬇ Desktop downloads:** see the [Releases](../../releases) page.
