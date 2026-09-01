@@ -382,16 +382,16 @@ namespace CapArt
             _sMini = new GUIStyle(GUI.skin.label) { fontSize = 10 };
             _sMiniBold = new GUIStyle(GUI.skin.label) { fontSize = 10, fontStyle = FontStyle.Bold };
             _sMiniWarn = new GUIStyle(_sMiniBold);
-            _sMiniWarn.normal.textColor = new Color(1f, 0.62f, 0.25f, 1f);
+            _sMiniWarn.normal.textColor = CapArtDraw.Ui(new Color(1f, 0.62f, 0.25f, 1f));
             _sMiniOver = new GUIStyle(_sMiniBold);
-            _sMiniOver.normal.textColor = new Color(1f, 0.45f, 0.4f, 1f);
+            _sMiniOver.normal.textColor = CapArtDraw.Ui(new Color(1f, 0.45f, 0.4f, 1f));
             _sRowInfo = new GUIStyle(_sMini) { alignment = TextAnchor.MiddleLeft };
             _sRowInfoOver = new GUIStyle(_sMiniBold) { alignment = TextAnchor.MiddleLeft };
-            _sRowInfoOver.normal.textColor = new Color(1f, 0.5f, 0.45f, 1f);
+            _sRowInfoOver.normal.textColor = CapArtDraw.Ui(new Color(1f, 0.5f, 0.45f, 1f));
             _sRowInfoLimit = new GUIStyle(_sMiniBold) { alignment = TextAnchor.MiddleLeft };
-            _sRowInfoLimit.normal.textColor = new Color(1f, 0.72f, 0.3f, 1f);
+            _sRowInfoLimit.normal.textColor = CapArtDraw.Ui(new Color(1f, 0.72f, 0.3f, 1f));
             _sCenterGray = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
-            _sCenterGray.normal.textColor = new Color(0.62f, 0.62f, 0.62f, 1f);
+            _sCenterGray.normal.textColor = CapArtDraw.Ui(new Color(0.62f, 0.62f, 0.62f, 1f));
             _sTitle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 };
         }
 
