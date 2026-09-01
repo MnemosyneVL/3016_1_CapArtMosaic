@@ -83,6 +83,33 @@ The sample caps live in `Assets/CapArt/Resources/capart-default-project.json`.
 After changing the CapType assets in the project, run
 **Tools → Cap Art → Bake Default Caps for App** to regenerate it, then rebuild.
 
+## Trademarks & sample images — please read
+
+Cap Art is a free, non-commercial hobby tool for planning physical mosaics
+made from used bottle caps. It is **not affiliated with, endorsed by, or
+sponsored by any beverage brand.**
+
+The bundled sample cap images are photographs of real, used bottle caps from
+the author's personal collection, included **solely to demonstrate the app**.
+The brand names and label artwork visible on them are trademarks and
+copyrighted designs of their respective owners, and no rights to them are
+granted here:
+
+- The sample photographs are **NOT covered by this repository's MIT
+  license** and are **not licensed for reuse**. Do not extract them, use
+  them commercially, put them on merchandise, use them in advertising, or
+  present them in a way that suggests any brand endorses you or this app.
+- **This app may not be used to sell branded imagery.** If you plan to sell
+  a mosaic or anything else you design with this tool, that's between you
+  and the owners of whatever brands appear on your caps — clear it with
+  them; nothing in this repository gives you that permission.
+- To design your own mosaics, photograph **your own** caps.
+- **Rights holders:** if you would like an image removed, open an issue on
+  this repository and it will be taken down promptly.
+
 ## License
 
-[MIT](LICENSE) — use it, modify it, share it.
+[MIT](LICENSE) — use it, modify it, share it. The MIT license applies to the
+**source code**. The sample cap photographs (in `Assets/CapArt/Images/` and
+embedded in `Assets/CapArt/Resources/` and the builds) are excluded — see
+the section above.

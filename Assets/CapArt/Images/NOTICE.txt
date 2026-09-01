@@ -1,0 +1,16 @@
+NOTICE — sample cap photographs
+
+These are photographs of real, used bottle caps from the author's personal
+collection. They are included in this repository ONLY as sample content to
+demonstrate the Cap Art app.
+
+The brand names and label artwork visible in these photographs are
+trademarks and copyrighted designs of their respective owners. This project
+is not affiliated with, endorsed by, or sponsored by any of those brands.
+
+These image files are NOT covered by the repository's MIT license and are
+not licensed for reuse of any kind: do not use them commercially, in
+advertising, on merchandise, or outside this app.
+
+Rights holders: to request removal of an image, please open an issue on the
+repository and it will be taken down promptly.
