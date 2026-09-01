@@ -8,7 +8,7 @@ template.
 Made by an artist planning a real mosaic from a bottle cap collection; shared
 so you can plan yours.
 
-**▶ Try it in your browser:** `https://YOUR-USERNAME.github.io/YOUR-REPO/`
+**▶ Try it in your browser:** `https://mnemosynevl.github.io/3016_1_CapArtMosaic/`
 *(link goes live once GitHub Pages is set up — see below)*
 
 **⬇ Desktop downloads:** see the [Releases](../../releases) page.
@@ -70,7 +70,7 @@ share the same core code. See
 3. Build into a folder named **`docs`** at the repo root.
 4. Commit and push, then on GitHub: **Settings → Pages → Deploy from a
    branch**, branch `main`, folder `/docs`.
-5. Your app is live at `https://YOUR-USERNAME.github.io/YOUR-REPO/`.
+5. Your app is live at `https://mnemosynevl.github.io/3016_1_CapArtMosaic/`.
 
 ### Desktop version
 
